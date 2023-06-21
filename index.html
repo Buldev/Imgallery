@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="referrer" content="no-referrer">
+    <!-- Imgur blocks local IP range referrals, uncomment this if your local testing setup requires it
+    <meta name="referrer" content="no-referrer">-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Albumswipe</title>
@@ -29,9 +30,9 @@
     import PhotoSwipeDynamicCaption from '/photoswipe/photoswipe-dynamic-caption-plugin.esm.js'
     import PhotoSwipe from '/photoswipe/photoswipe.esm.js';
 
-
     const galleryElement = document.getElementById('galleryContainer');
     const imageTemplate = document.getElementById('imageTemplate');
+    const videoTemplate = document.getElementById('videoTemplate');
     const imgurClientID = '6a45b6f714e6ab0';
 
     const fabutton = document.getElementById('fetchAlbumButton');
@@ -51,7 +52,9 @@
 
     const captionPlugin = new PhotoSwipeDynamicCaption(lightbox, {
         type: 'auto',
-        captionContent: 'figcaption'
+        captionContent: (slide) => {
+            return slide.data.element.parentNode.querySelector('span').innerHTML;
+        }
     });
 
     //TEMP
@@ -100,50 +103,59 @@
                 //
                 const image = images[index];
                 console.log(image)
-                const imageElementClone = imageTemplate.content.cloneNode(true);
-                //child 0 is the 'a' link element
-                imageElementClone.children[0].setAttribute('href', image['link']);
-                imageElementClone.children[0].setAttribute('data-pswp-width', image['width']);
-                imageElementClone.children[0].setAttribute('data-pswp-height', image['height']);
-                //the child of which is the 'img' image element
-                imageElementClone.children[0].children[0].setAttribute('src', image['link']);
+                let imageElementClone = '';
+                if(image['type'].startsWith('video/')) {
+                    imageElementClone = videoTemplate.content.cloneNode(true);
+                    imageElementClone.children[0].children[0].setAttribute('src', image['link']);
+                }
+                else {
+                    imageElementClone = imageTemplate.content.cloneNode(true);
+                    //child 0 is the 'a' link element
+                    imageElementClone.children[0].children[0].setAttribute('href', image['link']);
+                    imageElementClone.children[0].children[0].setAttribute('data-pswp-width', image['width']);
+                    imageElementClone.children[0].children[0].setAttribute('data-pswp-height', image['height']);
+                    //the child of which is the 'img' image element
+                    imageElementClone.children[0].children[0].children[0].setAttribute('src', image['link']);
+                }
 
-                if(image['title'] != null || image['description'] != null) {
-                    const caption = document.createElement('figcaption');
-                    if(image['title'] != null) {
-                        const captionTitle = document.createElement('strong');
-                        captionTitle.textContent = image['title'];
-                        caption.appendChild(captionTitle);
-                        caption.appendChild(document.createElement('br'));
-                    }
-                    if(image['description'] != null) {
-                        let description = image['description'].split('\n');
-                        for (let index = 0; index < description.length; index++) {
-                            const line = description[index];
-                            if(line != "") {
-                                const captionDescription = document.createTextNode(line);
-                                caption.appendChild(captionDescription);
-                                if(index != description.length - 1) {
-                                    caption.appendChild(document.createElement('br'))
-                                }
+                if(image['description'] != null) {
+                    const caption = document.createElement('span');
+                    let description = image['description'].split('\n');
+                    for (let index = 0; index < description.length; index++) {
+                        const line = description[index];
+                        if(line == "") {
+                            caption.appendChild(document.createElement('br'));
+                        }
+                        else {
+                            const captionDescription = document.createTextNode(line);
+                            caption.appendChild(captionDescription);
+                            if(index != description.length - 1) {
+                                caption.appendChild(document.createElement('br'))
                             }
                         }
+
                     }
                     imageElementClone.children[0].appendChild(caption);
                 }
                 galleryElement.appendChild(imageElementClone);
             }
-
             lightbox.init();
         })
     }
 </script>
 <template id="imageTemplate">
-    <a class="album-image" href="" 
+    <div class="album-image"> 
+        <a href=""
         data-pswp-width="0" 
         data-pswp-height="0" 
         target="_blank">
-        <img src="" alt="" />
-    </a>
+            <img src="" alt="" />
+        </a>
+    </div>
+</template>
+<template id="videoTemplate">
+    <div class="album-image">
+        <video src="" controls></video>
+    </div>
 </template>
 </html>

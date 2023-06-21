@@ -38,6 +38,12 @@ header {
     margin: auto;
     margin-bottom: 1rem;
 }
+.album-image video {
+    display: block;
+    max-width: 100%;
+    margin: auto;
+    margin-bottom: 1rem;
+}
 .album-image:link, .album-image:visited {
     color: white !important;
     text-decoration: none !important;

@@ -1,0 +1,44 @@
+html {
+    background-color: rgb(27, 17, 17);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+header {
+    display: flex;
+    padding-left: 1rem;
+}
+#inputContainer {
+    display:flex;
+    flex-grow: 1;
+    padding: 1rem;
+}
+#inputContainer input {
+    flex-grow: 1;
+    background-color: rgb(27, 17, 17);
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    margin-right: 1rem;
+}
+#galleryContainer {
+    display: flex;
+    flex-direction: column;
+    max-width: 1000px;
+    margin: auto;
+}
+.album-image {
+    max-width:100%;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 1rem;
+}
+.album-image img {
+    max-width: 100%;
+    display: block;
+    margin: auto;
+    margin-bottom: 1rem;
+}
+.album-image:link, .album-image:visited {
+    color: white !important;
+    text-decoration: none !important;
+}

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="referrer" content="no-referrer">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albumswipe</title>
+    <link rel="stylesheet" href="photoswipe/photoswipe.css">
+    <link rel="stylesheet" href="photoswipe/photoswipe-dynamic-caption-plugin.css">
+    <link rel="stylesheet" href="normalize.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Janart Viewer</h1>
+        <div id="inputContainer">
+            <input type="text" name="album-url" id="albumUrl">
+            <button type="button" id="fetchAlbumButton">Fetch album</button>    
+        </div>
+    </header>
+    <main>
+        <div id="galleryContainer">
+            
+        </div>
+    </main>
+</body>
+<script type="module">
+    import PhotoSwipeLightbox from '/photoswipe/photoswipe-lightbox.esm.js';
+    import PhotoSwipeDynamicCaption from '/photoswipe/photoswipe-dynamic-caption-plugin.esm.js'
+    import PhotoSwipe from '/photoswipe/photoswipe.esm.js';
+
+
+    const galleryElement = document.getElementById('galleryContainer');
+    const imageTemplate = document.getElementById('imageTemplate');
+    const imgurClientID = '6a45b6f714e6ab0';
+
+    const fabutton = document.getElementById('fetchAlbumButton');
+    fabutton.addEventListener('click', fetchUrl);
+
+    const lightbox = new PhotoSwipeLightbox({
+        gallery: '#galleryContainer',
+        children: 'a',
+        pswpModule: PhotoSwipe,
+
+        paddingFn: (viewportSize) => {
+            return {
+            top: 30, bottom: 30, left: 70, right: 70
+            }
+        },
+    });
+
+    const captionPlugin = new PhotoSwipeDynamicCaption(lightbox, {
+        type: 'auto',
+        captionContent: 'figcaption'
+    });
+
+    //TEMP
+    lightbox.init();
+
+    if(window.location.hash) {
+        fetchAlbum(window.location.hash.substring(1))
+    }
+
+    function fetchUrl() {
+        const url = document.getElementById('albumUrl').value
+        if(url.startsWith('https://imgur.com/a/')) {
+            window.location.hash = url.split('/').at(-1);
+            fetchAlbum(url.split('/').at(-1));
+        }
+        else {
+            console.log('Malformed url');
+        }
+    }
+    function fetchAlbum(hash) {
+        const request = new Request(`https://api.imgur.com/3/album/${hash}`, {
+            method: "GET",
+            headers: {'Authorization': `Client-ID ${imgurClientID}`}
+        });
+        fetch(request).then((response) => {
+            if (response.status == 200) {
+                return response.json();
+            }
+            else {
+                console.log(response);
+            }
+        })
+        .then((json) => {
+            console.log(json);
+            if(json['data']['title'] != null) {
+                galleryElement.innerHTML = `<h2>${json['data']['title']}</h2>`; //hard replace the html with just the title
+            }
+            else {
+                galleryElement.innerHtml = '';
+            }
+
+            const images = json['data']['images'];
+            for (let index = 0; index < images.length; index++) {
+                //
+                //TODO - HANDLE VIDEO ELEMENTS
+                //
+                const image = images[index];
+                console.log(image)
+                const imageElementClone = imageTemplate.content.cloneNode(true);
+                //child 0 is the 'a' link element
+                imageElementClone.children[0].setAttribute('href', image['link']);
+                imageElementClone.children[0].setAttribute('data-pswp-width', image['width']);
+                imageElementClone.children[0].setAttribute('data-pswp-height', image['height']);
+                //the child of which is the 'img' image element
+                imageElementClone.children[0].children[0].setAttribute('src', image['link']);
+
+                if(image['title'] != null || image['description'] != null) {
+                    const caption = document.createElement('figcaption');
+                    if(image['title'] != null) {
+                        const captionTitle = document.createElement('strong');
+                        captionTitle.textContent = image['title'];
+                        caption.appendChild(captionTitle);
+                        caption.appendChild(document.createElement('br'));
+                    }
+                    if(image['description'] != null) {
+                        let description = image['description'].split('\n');
+                        for (let index = 0; index < description.length; index++) {
+                            const line = description[index];
+                            if(line != "") {
+                                const captionDescription = document.createTextNode(line);
+                                caption.appendChild(captionDescription);
+                                if(index != description.length - 1) {
+                                    caption.appendChild(document.createElement('br'))
+                                }
+                            }
+                        }
+                    }
+                    imageElementClone.children[0].appendChild(caption);
+                }
+                galleryElement.appendChild(imageElementClone);
+            }
+
+            lightbox.init();
+        })
+    }
+</script>
+<template id="imageTemplate">
+    <a class="album-image" href="" 
+        data-pswp-width="0" 
+        data-pswp-height="0" 
+        target="_blank">
+        <img src="" alt="" />
+    </a>
+</template>
+</html>

@@ -53,7 +53,12 @@
     const captionPlugin = new PhotoSwipeDynamicCaption(lightbox, {
         type: 'auto',
         captionContent: (slide) => {
-            return slide.data.element.parentNode.querySelector('span').innerHTML;
+            if(slide.data.element.parentNode.querySelector('span')) {
+                return slide.data.element.parentNode.querySelector('span').innerHTML;
+            }
+            else {
+                return '';
+            }
         }
     });
 
@@ -71,7 +76,7 @@
             fetchAlbum(url.split('/').at(-1));
         }
         else {
-            console.log('Malformed url');
+            galleryElement.innerHTML = `<h2 class="warn">Malformed or missing url. Its start should look like "https://imgur.com/a/"</h2>`; //hard replace the html with just the title
         }
     }
     function fetchAlbum(hash) {
@@ -84,7 +89,7 @@
                 return response.json();
             }
             else {
-                console.log(response);
+                galleryElement.innerHTML = `<h2 class="warn">${response.status} - ${response.statusText}</h2>`; //hard replace the html with just the title
             }
         })
         .then((json) => {

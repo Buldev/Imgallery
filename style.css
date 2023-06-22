@@ -48,3 +48,7 @@ header {
     color: white !important;
     text-decoration: none !important;
 }
+.warn {
+    color: #d35555;
+    font-style: italic;
+}

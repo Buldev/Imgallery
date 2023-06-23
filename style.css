@@ -52,3 +52,6 @@ header {
     color: #d35555;
     font-style: italic;
 }
+.pswp__img {
+    image-rendering: pixelated;
+}

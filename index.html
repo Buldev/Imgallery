@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Imgur blocks local IP range referrals, uncomment this if your local testing setup requires it
-    <meta name="referrer" content="no-referrer">-->
+    <!-- Imgur blocks local IP range referrals, uncomment this if your local testing setup requires it-->
+    <meta name="referrer" content="no-referrer">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>/d͡ʒænɑːt/ Viewer</title>
@@ -10,9 +10,11 @@
     <link rel="stylesheet" href="photoswipe/photoswipe-dynamic-caption-plugin.css">
     <link rel="stylesheet" href="normalize.css">
     <link rel="stylesheet" href="style.css">
-    <style id="pixelatedStyle" disabled="true">
+    <style id="pixelatedStyle" disabled="false">
         .pswp__img {
-            image-rendering: pixelated;
+            /*Browsers don't seem to respect disabled="true" on page load
+              so the style is pixelated when pixelatedStyle is FALSE*/
+            image-rendering: auto; 
         }
     </style>
 </head>

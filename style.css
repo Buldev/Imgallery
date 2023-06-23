@@ -58,5 +58,5 @@ header {
 .pswp__dynamic-caption--aside {
     margin-top: 0px;
     bottom: 0;
-    overflow: scroll;
+    overflow-y: auto;
 }

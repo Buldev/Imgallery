@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="photoswipe/photoswipe-dynamic-caption-plugin.css">
     <link rel="stylesheet" href="normalize.css">
     <link rel="stylesheet" href="style.css">
+    <style id="pixelatedStyle" disabled>
+        .pswp__img {
+            image-rendering: pixelated;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -30,6 +35,7 @@
     import PhotoSwipeDynamicCaption from '/photoswipe/photoswipe-dynamic-caption-plugin.esm.js'
     import PhotoSwipe from '/photoswipe/photoswipe.esm.js';
 
+    const pixelatedStyle = document.getElementById('pixelatedStyle');
     const galleryElement = document.getElementById('galleryContainer');
     const imageTemplate = document.getElementById('imageTemplate');
     const videoTemplate = document.getElementById('videoTemplate');
@@ -62,8 +68,19 @@
         }
     });
 
-    //TEMP
-    lightbox.init();
+    lightbox.on('uiRegister', function() {
+        lightbox.pswp.ui.registerElement({
+            name: 'pixelButton',
+            title: 'Toggle pixelated rendering',
+            ariaLabel: 'Toggle pixelated rendering',
+            order: 9,
+            isButton: true,
+            html: '🏁',
+            onClick: (event, el) => {
+                pixelatedStyle.disabled = !pixelatedStyle.disabled;
+            }
+        });
+    });
 
     if(window.location.hash) {
         fetchAlbum(window.location.hash.substring(1))

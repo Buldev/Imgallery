@@ -55,3 +55,6 @@ header {
 .pswp__img {
     image-rendering: pixelated;
 }
+.pswp__dynamic-caption--aside {
+    margin-top: 0;
+}

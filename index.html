@@ -48,7 +48,7 @@
 
     const lightbox = new PhotoSwipeLightbox({
         gallery: '#galleryContainer',
-        children: 'a',
+        children: 'a, video',
         pswpModule: PhotoSwipe,
 
         paddingFn: (viewportSize) => {
@@ -61,7 +61,7 @@
     const captionPlugin = new PhotoSwipeDynamicCaption(lightbox, {
         type: 'auto',
         captionContent: (slide) => {
-            if(slide.data.element.parentNode.querySelector('span')) {
+            if(slide.data.element?.parentNode.querySelector('span')) {
                 return slide.data.element.parentNode.querySelector('span').innerHTML;
             }
             else {
@@ -165,7 +165,23 @@
                 galleryElement.appendChild(imageElementClone);
             }
             lightbox.init();
-        })
+        });
+
+        // hacky <video> embed support
+        lightbox.addFilter('itemData', (itemData, index) => {
+            if(itemData.element.tagName == "VIDEO") {
+                console.log(index, itemData)
+                return {
+                    html: 
+                    `<div class="video-slide">
+                        <span>
+                            <video src="${itemData.element.src}" controls="true"></video>
+                        </span>
+                    </div>`
+                }
+            }
+            return itemData;
+        });
     }
 </script>
 <template id="imageTemplate">

@@ -52,6 +52,21 @@ header {
     color: #d35555;
     font-style: italic;
 }
+.video-slide {
+    display: flex;
+    height: 100%;
+}
+.video-slide span {
+    margin: auto;
+    position: relative; 
+}
+.video-slide span::after {
+    content: "*Video might have a description";
+    font-style: italic;
+    position: absolute;
+    bottom: -1.5rem;
+    left: 0;
+}
 .pswp__img {
     image-rendering: pixelated;
 }

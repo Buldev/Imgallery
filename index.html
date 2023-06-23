@@ -112,10 +112,11 @@
         .then((json) => {
             console.log(json);
             if(json['data']['title'] != null) {
-                galleryElement.innerHTML = `<h2>${json['data']['title']}</h2>`; //hard replace the html with just the title
+                galleryElement.innerHTML = `<h2></h2>`; //hard replace the html with just the title
+                galleryElement.children[0].textContent = json['data']['title'];
             }
             else {
-                galleryElement.innerHtml = '';
+                galleryElement.innerHTML = '';
             }
 
             const images = json['data']['images'];

@@ -123,15 +123,15 @@
 
             const images = json['data']['images'];
             for (let index = 0; index < images.length; index++) {
-                //
-                //TODO - HANDLE VIDEO ELEMENTS
-                //
                 const image = images[index];
                 console.log(image)
                 let imageElementClone = '';
-                if(image['type'].startsWith('video/')) {
+                if(image['type'].startsWith('video/') || image['type'] == 'image/gif') {
                     imageElementClone = videoTemplate.content.cloneNode(true);
-                    imageElementClone.children[0].children[0].setAttribute('src', image['link']);
+                    imageElementClone.children[0].children[0].setAttribute('src', image['mp4']);
+                    if(!image['has_sound']) {
+                        imageElementClone.children[0].children[0].setAttribute('loop', true);
+                    }
                 }
                 else {
                     imageElementClone = imageTemplate.content.cloneNode(true);
@@ -170,12 +170,11 @@
         // hacky <video> embed support
         lightbox.addFilter('itemData', (itemData, index) => {
             if(itemData.element.tagName == "VIDEO") {
-                console.log(index, itemData)
                 return {
                     html: 
                     `<div class="video-slide">
                         <span>
-                            <video src="${itemData.element.src}" controls="true"></video>
+                            <video src="${itemData.element.src}" controls="true" loop=${itemData.element.loop}></video>
                         </span>
                     </div>`
                 }

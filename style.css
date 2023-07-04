@@ -67,6 +67,9 @@ header {
     bottom: -1.5rem;
     left: 0;
 }
+.video-slide video {
+    max-width: 100%;
+}
 .pswp__img {
     image-rendering: pixelated;
 }

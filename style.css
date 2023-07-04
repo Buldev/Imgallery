@@ -70,9 +70,6 @@ header {
 .video-slide video {
     max-width: 100%;
 }
-.pswp__bg {
-    opacity: 0.925 !important;
-}
 .pswp__img {
     image-rendering: pixelated;
 }

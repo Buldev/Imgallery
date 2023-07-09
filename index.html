@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Imgur blocks local IP range referrals, uncomment this if your local testing setup requires it
-    <meta name="referrer" content="no-referrer">-->
+    <!-- Imgur blocks local IP range referrals, uncomment this if your local testing setup requires it-->
+    <meta name="referrer" content="no-referrer">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>/d͡ʒænɑːt/ Viewer</title>
@@ -42,6 +42,10 @@
     const imageTemplate = document.getElementById('imageTemplate');
     const videoTemplate = document.getElementById('videoTemplate');
     const imgurClientID = '6a45b6f714e6ab0';
+
+    const overrides = {
+        'https://i.imgur.com/QzIP0lK.mp4': 'https://cdn.discordapp.com/attachments/484604584174813184/1127055363338944632/SPOILER_Mars_Needs_Senpais_Trailer.webm'
+    }
 
     const fabutton = document.getElementById('fetchAlbumButton');
     fabutton.addEventListener('click', fetchUrl);
@@ -124,10 +128,13 @@
 
             const images = json['data']['images'];
             for (let index = 0; index < images.length; index++) {
-                const image = images[index];
+                let image = images[index];
                 console.log(image)
                 let imageElementClone = '';
                 if(image['type'].startsWith('video/') || image['type'] == 'image/gif') {
+                    if(overrides.hasOwnProperty(image['mp4'])) {
+                        image['mp4'] = overrides[image['mp4']];
+                    }
                     imageElementClone = videoTemplate.content.cloneNode(true);
                     imageElementClone.children[0].children[0].setAttribute('src', image['mp4']);
                     if(!image['has_sound']) {
@@ -135,6 +142,9 @@
                     }
                 }
                 else {
+                    if(overrides.hasOwnProperty(image['link'])) {
+                        image['link'] = overrides[image['link']];
+                    }
                     imageElementClone = imageTemplate.content.cloneNode(true);
                     //child 0 is the 'a' link element
                     imageElementClone.children[0].children[0].setAttribute('href', image['link']);

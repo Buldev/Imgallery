@@ -43,6 +43,7 @@ header {
     max-width: 100%;
     margin: auto;
     margin-bottom: 1rem;
+    max-height: 80vh;
 }
 .album-image:link, .album-image:visited {
     color: white !important;

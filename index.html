@@ -53,7 +53,7 @@
 
     const lightbox = new PhotoSwipeLightbox({
         gallery: '#galleryContainer',
-        children: 'a, video',
+        children: 'a',
         pswpModule: PhotoSwipe,
         bgOpacity: 0.925,
         
@@ -137,9 +137,20 @@
                         image['mp4'] = overrides[image['mp4']];
                     }
                     imageElementClone = videoTemplate.content.cloneNode(true);
-                    imageElementClone.children[0].children[0].setAttribute('src', image['mp4']);
+                    let videoElement = imageElementClone.querySelector('video');
+                    let videoLink = imageElementClone.querySelector('a');
+
+                    videoLink.setAttribute('href', image['link']);
+                    videoLink.setAttribute('data-pswp-width', image['width']);
+                    videoLink.setAttribute('data-pswp-height', image['height']);
+                    videoLink.setAttribute('data-pswp-video-src', image['mp4']);
+                    videoLink.setAttribute('data-pswp-video-has-audio', false);
+
+                    videoElement.setAttribute('loop', false);
+                    videoElement.setAttribute('src', image['mp4']);
                     if(!image['has_sound']) {
-                        imageElementClone.children[0].children[0].setAttribute('loop', true);
+                        videoElement.setAttribute('loop', true);
+                        videoLink.setAttribute('data-pswp-video-has-audio', true);
                     }
                 }
                 else {
@@ -147,12 +158,14 @@
                         image['link'] = overrides[image['link']];
                     }
                     imageElementClone = imageTemplate.content.cloneNode(true);
-                    //child 0 is the 'a' link element
-                    imageElementClone.children[0].children[0].setAttribute('href', image['link']);
-                    imageElementClone.children[0].children[0].setAttribute('data-pswp-width', image['width']);
-                    imageElementClone.children[0].children[0].setAttribute('data-pswp-height', image['height']);
-                    //the child of which is the 'img' image element
-                    imageElementClone.children[0].children[0].children[0].setAttribute('src', image['link']);
+                    let imageNode = imageElementClone.querySelector('img');
+                    let imageLink = imageElementClone.querySelector('a');
+
+                    imageLink.setAttribute('href', image['link']);
+                    imageLink.setAttribute('data-pswp-width', image['width']);
+                    imageLink.setAttribute('data-pswp-height', image['height']);
+
+                    imageNode.setAttribute('src', image['link']);
                 }
 
                 if(image['description'] != null) {
@@ -179,19 +192,41 @@
             lightbox.init();
         });
 
-        // hacky <video> embed support
         lightbox.addFilter('itemData', (itemData, index) => {
-            if(itemData.element.tagName == "VIDEO") {
-                return {
-                    html: 
-                    `<div class="video-slide">
-                        <span>
-                            <video src="${itemData.element.src}" controls="true" loop=${itemData.element.loop}></video>
-                        </span>
-                    </div>`
-                }
+            console.log(itemData);
+            const videoSrc = itemData.element.dataset.pswpVideoSrc;
+            const videoHasAudio = itemData.element.dataset.pswpVideoHasAudio;
+            if (videoSrc) {
+                itemData.videoSrc = videoSrc;
+                itemData.videoHasAudio = videoHasAudio;
             }
             return itemData;
+        });
+
+        lightbox.on('contentLoad', (e) => {
+            const { content, isLazy } = e;
+            if(content.data.videoSrc) {
+                e.preventDefault();
+
+                content.element = document.createElement('video');
+                content.element.src = content.data.videoSrc;
+                content.element.autoplay = false;
+                content.element.loop = !content.data.videoHasAudio;
+                content.element.controls = true;
+            }
+        });
+
+        lightbox.addFilter('useContentPlaceholder', (useContentPlaceholder, content) => {
+            if(content.data.videoSrc) {
+                return false;
+            }
+            return useContentPlaceholder;
+        });
+        lightbox.addFilter('isContentLoading', (isContentLoading, content) => {
+            if(content.data.videoSrc) {
+                return false;
+            }
+            return isContentLoading;
         });
     }
 </script>
@@ -207,7 +242,12 @@
 </template>
 <template id="videoTemplate">
     <div class="album-image">
-        <video src="" controls></video>
+        <a href=""
+        data-pswp-width="0" 
+        data-pswp-height="0" 
+        target="_blank">
+            <video src="" controls></video>
+        </a>
     </div>
 </template>
 </html>

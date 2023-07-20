@@ -211,7 +211,7 @@
                 content.element = document.createElement('video');
                 content.element.src = content.data.videoSrc;
                 content.element.autoplay = false;
-                content.element.loop = !content.data.videoHasAudio;
+                content.element.setAttribute('loop', !content.data.videoHasAudio);
                 content.element.controls = true;
             }
         });
